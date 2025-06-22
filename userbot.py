@@ -61,8 +61,8 @@ async def add_user_handler(client, message: Message):
 @app.on_message(filters.command("add_group"))
 async def add_group_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if user_id not in users_data:
-        await message.reply("ليس لديك صلاحية استخدام البوت. اطلب من المدير إضافتك.")
+    if int(user_id) != ADMIN_ID:
+        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
         return
     try:
         _, group_id, interval = message.text.split()
@@ -77,8 +77,8 @@ async def add_group_handler(client, message: Message):
 @app.on_message(filters.command("add_msg"))
 async def add_msg_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if user_id not in users_data:
-        await message.reply("ليس لديك صلاحية استخدام البوت.")
+    if int(user_id) != ADMIN_ID:
+        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
         return
     try:
         _, group_id, *msg = message.text.split()
@@ -93,8 +93,8 @@ async def add_msg_handler(client, message: Message):
 @app.on_message(filters.command("list"))
 async def list_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if user_id not in users_data:
-        await message.reply("ليس لديك صلاحية استخدام البوت.")
+    if int(user_id) != ADMIN_ID:
+        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
         return
     text = ""
     for group_id, group_info in users_data[user_id]["groups"].items():
