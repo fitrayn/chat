@@ -3,7 +3,7 @@ import asyncio
 import json
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from pyrogram.idle import idle
+from pyrogram import idle
 
 api_id = int(os.environ["API_ID"])
 api_hash = os.environ["API_HASH"]
