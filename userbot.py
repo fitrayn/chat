@@ -1,12 +1,14 @@
+import os
 import asyncio
 import json
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.idle import idle
 
-api_id = 6210186
-api_hash = "e707303847d5554af8b1c2a13b10150c"
-session_name = "my_userbot"
+api_id = int(os.environ["API_ID"])
+api_hash = os.environ["API_HASH"]
+bot_token = os.environ["BOT_TOKEN"]
+session_name = "my_bot"
 
 ADMIN_ID = 664193835  # معرفك كمدير
 
@@ -40,7 +42,7 @@ async def send_scheduled_messages(app: Client):
         save_data(users_data)
         await asyncio.sleep(10)
 
-app = Client(session_name, api_id, api_hash)
+app = Client(session_name, api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
 @app.on_message(filters.command("add_user") & filters.user(ADMIN_ID))
 async def add_user_handler(client, message: Message):
@@ -104,7 +106,7 @@ async def list_handler(client, message: Message):
 async def main():
     await app.start()
     asyncio.create_task(send_scheduled_messages(app))
-    print("Userbot is running...")
+    print("Bot is running...")
     await idle()
     await app.stop()
 
