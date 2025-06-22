@@ -49,7 +49,7 @@ async def send_scheduled_messages(app: Client):
 
 app = Client(session_name, api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
-@app.on_message(filters.command("add_user") & filters.user(ADMIN_ID))
+@app.on_message(filters.command("add_user"))
 async def add_user_handler(client, message: Message):
     try:
         _, user_id = message.text.split()
@@ -66,9 +66,6 @@ async def add_user_handler(client, message: Message):
 @app.on_message(filters.command("add_group"))
 async def add_group_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if int(user_id) != ADMIN_ID:
-        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
-        return
     try:
         _, group_id, interval = message.text.split()
         group_id = int(group_id)
@@ -82,9 +79,6 @@ async def add_group_handler(client, message: Message):
 @app.on_message(filters.command("add_msg"))
 async def add_msg_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if int(user_id) != ADMIN_ID:
-        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
-        return
     try:
         _, group_id, *msg = message.text.split()
         group_id = str(int(group_id))
@@ -98,11 +92,8 @@ async def add_msg_handler(client, message: Message):
 @app.on_message(filters.command("list"))
 async def list_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if int(user_id) != ADMIN_ID:
-        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
-        return
     text = ""
-    for group_id, group_info in users_data[user_id]["groups"].items():
+    for group_id, group_info in users_data.get(user_id, {}).get("groups", {}).items():
         text += f"Group {group_id} (كل {group_info['interval']}ث):\n"
         for i, m in enumerate(group_info["messages"]):
             text += f"  {i+1}- {m}\n"
@@ -110,10 +101,6 @@ async def list_handler(client, message: Message):
 
 @app.on_message(filters.command("help"))
 async def help_handler(client, message: Message):
-    user_id = str(message.from_user.id)
-    if int(user_id) != ADMIN_ID:
-        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
-        return
     help_text = (
         "\n".join([
             "\u2022 /add_user user_id — إضافة مستخدم جديد.",
@@ -134,7 +121,7 @@ async def help_handler(client, message: Message):
     ], resize_keyboard=True)
     await message.reply(help_text, reply_markup=keyboard)
 
-@app.on_message(filters.command("remove_user") & filters.user(ADMIN_ID))
+@app.on_message(filters.command("remove_user"))
 async def remove_user_handler(client, message: Message):
     try:
         _, user_id = message.text.split()
@@ -151,13 +138,10 @@ async def remove_user_handler(client, message: Message):
 @app.on_message(filters.command("remove_group"))
 async def remove_group_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if int(user_id) != ADMIN_ID:
-        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
-        return
     try:
         _, group_id = message.text.split()
         group_id = str(int(group_id))
-        if group_id in users_data[user_id]["groups"]:
+        if group_id in users_data.get(user_id, {}).get("groups", {}):
             del users_data[user_id]["groups"][group_id]
             save_data(users_data)
             await message.reply(f"تم حذف المجموعة {group_id}.")
@@ -169,14 +153,11 @@ async def remove_group_handler(client, message: Message):
 @app.on_message(filters.command("remove_msg"))
 async def remove_msg_handler(client, message: Message):
     user_id = str(message.from_user.id)
-    if int(user_id) != ADMIN_ID:
-        await message.reply("ليس لديك صلاحية استخدام البوت. فقط المدير يمكنه ذلك.")
-        return
     try:
         _, group_id, msg_index = message.text.split()
         group_id = str(int(group_id))
         msg_index = int(msg_index) - 1
-        if group_id in users_data[user_id]["groups"]:
+        if group_id in users_data.get(user_id, {}).get("groups", {}):
             messages = users_data[user_id]["groups"][group_id]["messages"]
             if 0 <= msg_index < len(messages):
                 removed = messages.pop(msg_index)
