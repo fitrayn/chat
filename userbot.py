@@ -70,6 +70,8 @@ async def add_group_handler(client, message: Message):
         _, group_id, interval = message.text.split()
         group_id = int(group_id)
         interval = int(interval)
+        if user_id not in users_data:
+            users_data[user_id] = {"groups": {}}
         users_data[user_id]["groups"][str(group_id)] = {"messages": [], "interval": interval, "msg_index": 0}
         save_data(users_data)
         await message.reply(f"تمت إضافة المجموعة {group_id}.")
@@ -83,6 +85,9 @@ async def add_msg_handler(client, message: Message):
         _, group_id, *msg = message.text.split()
         group_id = str(int(group_id))
         msg = " ".join(msg)
+        if user_id not in users_data or group_id not in users_data[user_id]["groups"]:
+            await message.reply("المجموعة غير موجودة. أضف المجموعة أولاً.")
+            return
         users_data[user_id]["groups"][group_id]["messages"].append(msg)
         save_data(users_data)
         await message.reply(f"تمت إضافة الرسالة للمجموعة {group_id}.")
