@@ -10,7 +10,7 @@ api_hash = os.environ["API_HASH"]
 bot_token = os.environ["BOT_TOKEN"]
 session_name = "my_bot"
 
-ADMIN_ID = 664193835  # معرفك كمدير
+ADMIN_ID = 664193835  # معرف المدير @Doc_HEMA
 
 DATA_FILE = "data.json"
 
