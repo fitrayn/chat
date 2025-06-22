@@ -2,7 +2,7 @@ import os
 import asyncio
 import json
 from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram.types import Message, ReplyKeyboardMarkup
 from pyrogram import idle
 
 api_id = int(os.environ["API_ID"])
@@ -126,7 +126,13 @@ async def help_handler(client, message: Message):
             "/help — عرض هذه الرسالة."
         ])
     )
-    await message.reply(help_text)
+    keyboard = ReplyKeyboardMarkup([
+        ["/add_user", "/remove_user"],
+        ["/add_group", "/remove_group"],
+        ["/add_msg", "/remove_msg"],
+        ["/list", "/help"]
+    ], resize_keyboard=True)
+    await message.reply(help_text, reply_markup=keyboard)
 
 @app.on_message(filters.command("remove_user") & filters.user(ADMIN_ID))
 async def remove_user_handler(client, message: Message):
